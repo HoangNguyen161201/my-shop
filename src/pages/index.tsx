@@ -1,33 +1,30 @@
 import CountDown from "@/components/CountDown";
+import FlashSale from "@/components/FlashSale";
 import Input from "@/components/form/Input";
-import { Box, HStack, Text, VStack, Grid } from "@chakra-ui/react";
+import ProductCard from "@/components/ProductCard";
+import { Box, Grid, HStack, Stack, Text, VStack } from "@chakra-ui/react";
 import { GoSearch } from "react-icons/go";
 
 export default function index() {
   return (
-    <VStack py={5} px={5} border={"1px solid red"}>
-      <HStack w={"full"} alignItems={"center"} justifyContent={"space-between"}>
-        <HStack
-          spaceX={2}
-          w={"100%"}
-          alignItems={"center"}
-          justifyContent={"start"}
-        >
-          <Text w={"fit-content"} fontWeight={700} fontSize={"2xl"}>
-            Flash Sale
-          </Text>
-          <CountDown
-            timeExtra={23 * 55 * 60 * 1000}
-            px={2}
-            fontSize={"sm"}
-            borderRadius={5}
-            py={1}
-            fontWeight={600}
-            bg={"green.200"}
-          />
-        </HStack>
+    <VStack mb={5} spaceY={10} py={5} pt={[10, 20]} px={[2, 5]}>
+      <Stack
+        shadow={"sm"}
+        bg={"white"}
+        zIndex={1}
+        py={[2, 5]}
+        px={[2, 5]}
+        pos={"fixed"}
+        top={0}
+        spaceY={[0, 0]}
+        direction={["column", "row"]}
+        w={"full"}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+      >
+        <FlashSale display={["none", "flex"]} />
         <Input
-          maxW={300}
+          maxW={["full", 300]}
           startElement={
             <Box pl={3.5}>
               <GoSearch />
@@ -43,25 +40,31 @@ export default function index() {
             placeholder: "Nhập tên hoặc mã sản phẩm ...",
           }}
         />
-      </HStack>
-      <Grid
-        border={'1px solid red'}
-        w={'full'}
-        templateColumns={[
-          "repeat(1, 1fr)",
-          "repeat(2, 1fr)",
-          "repeat(2, 1fr)",
-          "repeat(3, 1fr)",
-          "repeat(4, 1fr)"
-        ]}
-      >
-        <Box h="20" bg="red.200" />
-        <Box h="20" bg="blue.200" />
-        <Box h="20" bg="green.200" />
-        <Box h="20" bg="red.200" />
-        <Box h="20" bg="blue.200" />
-        <Box h="20" bg="green.200" />
-      </Grid>
+      </Stack>
+      <Box>
+        <FlashSale mb={5} display={["flex", "none"]} />
+        <Grid
+          gapX={5}
+          gapY={[5, 7, 9]}
+          w={"full"}
+          templateColumns={[
+            "repeat(2, 1fr)",
+            "repeat(2, 1fr)",
+            "repeat(3, 1fr)",
+            "repeat(3, 1fr)",
+            "repeat(4, 1fr)",
+          ]}
+        >
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+        </Grid>
+      </Box>
     </VStack>
   );
 }
