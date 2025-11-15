@@ -1,6 +1,6 @@
 import CountDown from "@/components/CountDown";
 import Input from "@/components/form/Input";
-import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, HStack, Text, VStack, Grid } from "@chakra-ui/react";
 import { GoSearch } from "react-icons/go";
 
 export default function index() {
@@ -44,6 +44,24 @@ export default function index() {
           }}
         />
       </HStack>
+      <Grid
+        border={'1px solid red'}
+        w={'full'}
+        templateColumns={[
+          "repeat(1, 1fr)",
+          "repeat(2, 1fr)",
+          "repeat(2, 1fr)",
+          "repeat(3, 1fr)",
+          "repeat(4, 1fr)"
+        ]}
+      >
+        <Box h="20" bg="red.200" />
+        <Box h="20" bg="blue.200" />
+        <Box h="20" bg="green.200" />
+        <Box h="20" bg="red.200" />
+        <Box h="20" bg="blue.200" />
+        <Box h="20" bg="green.200" />
+      </Grid>
     </VStack>
   );
 }
