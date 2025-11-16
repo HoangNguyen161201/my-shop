@@ -14,6 +14,7 @@ import {
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { GoSearch } from "react-icons/go";
+import { HashLoader } from "react-spinners";
 import { toast } from "react-toastify";
 
 export default function index() {
@@ -24,7 +25,7 @@ export default function index() {
 
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: ()=> toast.success('Xoá sản phẩm thành công')
+    onSuccess: () => toast.success("Xoá sản phẩm thành công"),
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
@@ -120,13 +121,35 @@ export default function index() {
       </Stack>
       <Box width={"full"}>
         <FlashSale mb={5} display={["flex", "none"]} />
+        {!data && status == "pending" && (
+          <Center px={3} w={"full"} h={"30vh"}>
+            <Box>
+              <HashLoader
+                color={"green"}
+                style={{
+                  opacity: 0.5,
+                }}
+                loading={true}
+                size={50}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            </Box>
+          </Center>
+        )}
         {status == "success" &&
         (!data?.pages ||
           data?.pages.flatMap((item) => item?.data).length == 0) ? (
-          <Center h={'50vh'}>
-            <VStack w={'full'}>
-              <Image w={'full'} maxW={450} src={"/not-found.png"} />
-              <Text color={'gray.500'} fontWeight={[600, 700]} fontSize={['md', 'lg']}>Không tồn tại sản phẩm!</Text>
+          <Center h={"50vh"}>
+            <VStack w={"full"}>
+              <Image w={"full"} maxW={450} src={"/not-found.png"} />
+              <Text
+                color={"gray.500"}
+                fontWeight={[600, 700]}
+                fontSize={["md", "lg"]}
+              >
+                Không tồn tại sản phẩm!
+              </Text>
             </VStack>
           </Center>
         ) : (
