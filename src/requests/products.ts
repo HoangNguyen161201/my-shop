@@ -25,6 +25,8 @@ export const deleteProduct = async (id: string) => {
   }
 };
 
+
+
 export const createProduct = async (data: productResponse) => {
   try {
     const response = await axios.post(`/api/products/create`, data);
@@ -36,3 +38,5 @@ export const createProduct = async (data: productResponse) => {
     throw error; // ném tiếp lỗi khác
   }
 };
+
+

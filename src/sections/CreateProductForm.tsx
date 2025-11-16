@@ -1,5 +1,6 @@
 import Input from "@/components/form/Input";
 import { createProduct } from "@/requests/products";
+import { revalidateHome } from "@/requests/revalidate";
 import { productResponse } from "@/types/product";
 import { Box, Button, InputProps, Text, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -68,11 +69,20 @@ export default function CreateProductForm() {
     formState: { errors },
   } = methods;
 
+  const revalidateHomeMutation = useMutation({
+    mutationFn: revalidateHome,
+  });
+
   const createProductMutation = useMutation({
     mutationFn: createProduct,
     onSuccess: () => {
-      methods.reset();
+      methods.setValue('adsUrl', '');
+      methods.setValue('imgUrl', '');
+      methods.setValue('newPrice', 0);
+      methods.setValue('oldPrice', 0);
+      methods.setValue('title', '');
       toast.success("Tạo mới sản phẩm thành công");
+      revalidateHomeMutation.mutate()
     },
   });
 

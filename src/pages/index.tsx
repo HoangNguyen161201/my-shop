@@ -1,7 +1,9 @@
 import FlashSale from "@/components/FlashSale";
 import Input from "@/components/form/Input";
 import ProductCard from "@/components/ProductCard";
+import clientPromise from "@/lib/mongodb";
 import { deleteProduct, getProducts } from "@/requests/products";
+import { revalidateHome } from "@/requests/revalidate";
 import {
   Box,
   Center,
@@ -11,26 +13,26 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { GoSearch } from "react-icons/go";
-import { HashLoader } from "react-spinners";
 import { toast } from "react-toastify";
 
-export default function index() {
+export default function index({ initialProducts }: { initialProducts: any }) {
   const [isDelete, setIsDelete] = useState(false);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const deleteProductMutation = useMutation({
-    mutationFn: deleteProduct,
-    onSuccess: () => toast.success("Xoá sản phẩm thành công"),
-  });
+  const queryClient = useQueryClient();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useInfiniteQuery({
-      queryKey: ["products", searchQuery],
+      queryKey: searchQuery ? ["products", searchQuery] : ["products"],
       queryFn: ({ pageParam = 1, queryKey }) => {
         const [_key, search] = queryKey; // lấy searchQuery từ queryKey
         return getProducts({ pageParam, search }); // truyền vào API
@@ -42,7 +44,20 @@ export default function index() {
         return undefined; // hết page
       },
       initialPageParam: 1,
+      placeholderData: { pages: [initialProducts], pageParams: [1] },
     });
+  const revalidateHomeMutation = useMutation({
+    mutationFn: revalidateHome,
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      toast.success("Xoá sản phẩm thành công");
+      queryClient.invalidateQueries({ queryKey: ["products"],  });
+      revalidateHomeMutation.mutate();
+    },
+  });
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -121,22 +136,6 @@ export default function index() {
       </Stack>
       <Box width={"full"}>
         <FlashSale mb={5} display={["flex", "none"]} />
-        {!data && status == "pending" && (
-          <Center px={3} w={"full"} h={"30vh"}>
-            <Box>
-              <HashLoader
-                color={"green"}
-                style={{
-                  opacity: 0.5,
-                }}
-                loading={true}
-                size={50}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              />
-            </Box>
-          </Center>
-        )}
         {status == "success" &&
         (!data?.pages ||
           data?.pages.flatMap((item) => item?.data).length == 0) ? (
@@ -186,4 +185,44 @@ export default function index() {
       </Box>
     </VStack>
   );
+}
+
+export async function getStaticProps() {
+  const client = await clientPromise;
+  const db = client.db("myShop");
+
+  const pageNum = 1;
+  const limitNum = 12;
+  const skip = (pageNum - 1) * limitNum;
+
+  // Lấy tổng số products
+  const total = await db.collection("products").countDocuments();
+
+  // Lấy danh sách products với pagination
+  const products = await db
+    .collection("products")
+    .find({ deleted: { $ne: true } })
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limitNum)
+    .toArray();
+
+  // Convert _id thành string
+  const serializedProducts = products.map((product) => ({
+    ...product,
+    _id: product._id.toString(),
+  }));
+
+  return {
+    props: {
+      initialProducts: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+        data: serializedProducts,
+      },
+    },
+    revalidate: false,
+  };
 }
