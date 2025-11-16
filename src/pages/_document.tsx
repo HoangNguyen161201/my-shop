@@ -4,6 +4,12 @@ export default function Document() {
   return (
     <Html suppressHydrationWarning lang="vi">
       <Head>
+        <link rel="icon" href="/logo.ico" />
+        <title>Siêu sale sản phẩm chất lượng – Giá rẻ, Deal hôm nay!</title>
+        <meta
+          name="description"
+          content="Mua các sản phẩm chất lượng với giá rẻ nhất hôm nay. Đồng hồ, giày, túi xách và nhiều sản phẩm khác, ưu đãi cực hot, giao hàng nhanh."
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
