@@ -2,11 +2,12 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import LinkTiktok from "@/components/LinkTiktok";
 import { deleteTiktokUrl, getTiktokUrls } from "@/requests/tiktok";
 import CreateTiktokUrlForm from "@/sections/CreateLinkTiktok";
-import { Center, Image, Text, VStack } from "@chakra-ui/react";
+import { Center, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { NextPageWithLayout } from "../_app";
+import { getAccess } from "@/requests/accesses";
 
 const VideoTiktoks: NextPageWithLayout = () => {
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
@@ -22,6 +23,11 @@ const VideoTiktoks: NextPageWithLayout = () => {
     queryFn: getTiktokUrls,
   });
 
+  const { data: accessData } = useQuery<any>({
+    queryKey: ["access"],
+    queryFn: getAccess,
+  });
+
   const deleteMutation = useMutation({
     mutationFn: deleteTiktokUrl,
 
@@ -30,6 +36,10 @@ const VideoTiktoks: NextPageWithLayout = () => {
   return (
     <Center px={2} h={"95vh"}>
       <VStack spaceY={5} w={"full"} maxW={320}>
+        <HStack w={'full'}>
+          <Text fontWeight={500}>Lượt truy cập:</Text>
+          <Text color={'green'} bg={'green.100'} borderRadius={4} fontWeight={500} px={2}>{accessData?.access?.count || 0}</Text>
+        </HStack>
         <CreateTiktokUrlForm handleSuccess={refetch} />
         <VStack
           w={"full"}

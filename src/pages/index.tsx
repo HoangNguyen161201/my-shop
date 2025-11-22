@@ -2,6 +2,7 @@ import FlashSale from "@/components/FlashSale";
 import Input from "@/components/form/Input";
 import ProductCard from "@/components/ProductCard";
 import clientPromise from "@/lib/mongodb";
+import { updateAccess } from "@/requests/accesses";
 import { deleteProduct, getProducts } from "@/requests/products";
 import { revalidateHome } from "@/requests/revalidate";
 import {
@@ -59,6 +60,10 @@ export default function index({ initialProducts }: { initialProducts: any }) {
     },
   });
 
+  const updateAccessMutation = useMutation({
+    mutationFn: updateAccess
+  });
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,8 +88,11 @@ export default function index({ initialProducts }: { initialProducts: any }) {
   useEffect(() => {
     if (localStorage.getItem("isLogin")) {
       setIsDelete(true);
+    } else if(!localStorage.getItem("counted")) {
+       updateAccessMutation.mutate()
+       localStorage.setItem("counted", '1')
     }
-  });
+  }, []);
 
   useEffect(() => {
     const searchTimeout = setTimeout(() => {
